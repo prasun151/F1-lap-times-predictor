@@ -1,0 +1,7 @@
+.venv/
+.python-version
+archive.zip
+*.csv
+pit_stops.csv
+pyproject.toml
+uv.lock
