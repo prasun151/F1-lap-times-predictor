@@ -98,6 +98,45 @@ def get_historical_weather(latitude, longitude, date_str):
         print(f"  An unexpected error occurred processing weather data: {e}")
         return None
 
+
+def fetch_historical_weather_for_races(races_df):
+    """
+    Fetches weather data for multiple races from a DataFrame.
+    
+    Args:
+        races_df (pd.DataFrame): DataFrame with columns: season, round, date, lat, long
+        
+    Returns:
+        pd.DataFrame: DataFrame with weather data for each race
+    """
+    import pandas as pd
+    import time
+    
+    weather_records = []
+    
+    for _, race in races_df.iterrows():
+        race_date_str = str(race['date'])
+        if 'T' in race_date_str:  # Remove time portion if present
+            race_date_str = race_date_str.split('T')[0]
+        
+        weather = get_historical_weather(race['lat'], race['long'], race_date_str)
+        
+        if weather:
+            weather_record = {
+                'season': race['season'],
+                'round': race['round'],
+                'circuitId': race['circuitId'],
+                'mean_temp': weather['mean_temp'],
+                'precipitation_sum': weather['precipitation_sum'],
+                'windspeed_mean': weather['windspeed_mean']
+            }
+            weather_records.append(weather_record)
+        
+        time.sleep(0.5)  # Rate limiting
+    
+    return pd.DataFrame(weather_records)
+
+
 if __name__ == "__main__":
     print("Executing weather_client.py directly for testing...")
 
